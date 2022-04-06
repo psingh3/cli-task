@@ -3,6 +3,8 @@
 const yargs = require('yargs');
 const axios = require('axios');
 const { Pool, Client } = require('pg');
+const NewsAPI = require('newsapi');
+const newsapi = new NewsAPI('65280fb593914f6a8fea7ea04f41e30c');
 
 const options = yargs.usage('Usage: -n <name>').option('n', {
 	alias: 'name',
@@ -34,6 +36,7 @@ async function poolConnect() {
 	return pool;
 }
 
+// Save the post
 async function savePost(pool, post) {
 	const text = `
     INSERT INTO posts (headline, body)
@@ -47,7 +50,10 @@ async function savePost(pool, post) {
 (async () => {
 	const pool = await poolConnect();
 
-	let posts = await axios.get(url, { headers: { Accept: 'application/json' } });
+	let posts = await newsapi.v2.everything({
+		q: 'tesla',
+		language: 'en',
+	});
 
 	console.log('posts:', posts);
 	let postObj = {
