@@ -16,10 +16,6 @@ const options = yargs.usage('Usage: -n <name>').option('n', {
 const greeting = `Hello, ${options.name}!`;
 console.log(greeting);
 
-console.log("Here's a random post :");
-
-const url = 'https://rapidapi.com/search/news';
-
 // Data base things
 const credentials = {
 	user: 'postgres',
@@ -47,19 +43,34 @@ async function savePost(pool, post) {
 	return pool.query(text, values);
 }
 
+async function getTheLatestPosts(posts, size) {
+	let items;
+	if (posts && posts.length) {
+		items = posts.slice(0, size);
+	}
+	return items;
+}
+
 (async () => {
 	const pool = await poolConnect();
 
 	let posts = await newsapi.v2.everything({
 		q: 'tesla',
 		language: 'en',
+		sortBy: 'relevancy',
+		page: 1,
 	});
 
-	console.log('posts:', posts);
-	let postObj = {
-		headline: 'I am first article',
-		body: 'I am body of the article',
-	};
-	await savePost(pool, postObj);
+	if (posts && posts.length) {
+		let latestPosts = await getTheLatestPosts(posts, 3);
+		for (var post of latestPosts) {
+			let postObj = {
+				headline: post.title,
+				body: post.description,
+			};
+			await savePost(pool, postObj);
+		}
+	}
+
 	await pool.end();
 })();
