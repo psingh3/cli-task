@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 const yargs = require('yargs');
 const axios = require('axios');
 const { Pool, Client } = require('pg');
@@ -43,6 +42,19 @@ async function savePost(pool, post) {
 	return pool.query(text, values);
 }
 
+// call the news api
+async function callTheNewsApi() {
+	let posts = await newsapi.v2.everything({
+		q: 'tesla',
+		language: 'en',
+		sortBy: 'relevancy',
+		page: 1,
+	});
+
+	return posts;
+}
+
+// get the latest posts
 async function getTheLatestPosts(posts, size) {
 	let items;
 	if (posts && posts.length) {
@@ -51,15 +63,11 @@ async function getTheLatestPosts(posts, size) {
 	return items;
 }
 
+// Run the cli
 (async () => {
 	const pool = await poolConnect();
 
-	let posts = await newsapi.v2.everything({
-		q: 'tesla',
-		language: 'en',
-		sortBy: 'relevancy',
-		page: 1,
-	});
+	let posts = await callTheNewsApi();
 
 	if (posts && posts.articles && posts.articles.length) {
 		let latestPosts = await getTheLatestPosts(posts.articles, 3);
@@ -71,6 +79,7 @@ async function getTheLatestPosts(posts, size) {
 			};
 			await savePost(pool, postObj);
 		}
+		console.log('Saved articles:-', latestPosts);
 	}
 
 	await pool.end();
