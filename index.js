@@ -61,8 +61,9 @@ async function getTheLatestPosts(posts, size) {
 		page: 1,
 	});
 
-	if (posts && posts.length) {
-		let latestPosts = await getTheLatestPosts(posts, 3);
+	if (posts && posts.articles && posts.articles.length) {
+		let latestPosts = await getTheLatestPosts(posts.articles, 3);
+
 		for (var post of latestPosts) {
 			let postObj = {
 				headline: post.title,
