@@ -1,0 +1,21 @@
+{
+  "name": "cli-task",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "hello": "./bin/index.js"
+  },
+  "dependencies": {
+    "axios": "^0.26.1",
+    "boxen": "4.0",
+    "chalk": "2.4",
+    "pg": "^8.7.3",
+    "yargs": "^17.4.0"
+  }
+}
